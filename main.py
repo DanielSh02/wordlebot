@@ -1,4 +1,5 @@
 from wordle import *
+from bot import *
 
 def main():
     wordle = Wordle()
@@ -11,9 +12,11 @@ def main():
                 print(f"Congrats! You won in {guesses} guesses!")
                 break
             else:
-                print(wordle.result(guess))
+                print(wordle.result(guess, wordle.answer))
         except:
             print("Not a valid word")
 
             
-main()
+bot = Bot(guesses=100)
+print(bot.result("table", "fable"))
+print(bot.solve())

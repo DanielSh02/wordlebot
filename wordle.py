@@ -1,11 +1,10 @@
-from email.policy import default
 import random
 
 
-default_word_list = set()
+default_word_list = []
 with open("wordlists/valid-wordle-words.txt", "r") as words:
     for word in words:
-        default_word_list.add(word.strip())
+        default_word_list.append(word.strip())
 
 
 class Wordle():
@@ -19,22 +18,19 @@ class Wordle():
     def isCorrect(self, word: str) -> bool:
         return word == self.answer
     
-    def result(self, word: str) -> list[int]:
+    def result(self, word: str, ans) -> list[int]:
         word = word.lower()
-        print(self.words)
-        print(word in self.words)
         if not word in self.words:
             raise Exception("Invalid Guess")
-        res = []
+        res = ""
         for i, c in enumerate(word):
-            if c == self.answer[i]:
-                res.append(2)
-            elif c in self.answer:
-                res.append(1)
+            if c == ans[i]:
+                res += "2"
+            elif c in ans:
+                res += "1"
             else:
-                res.append(0)
-        return res
-
+                res += "0"
+        return res 
 
     
     
