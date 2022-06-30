@@ -17,6 +17,7 @@ class Bot(Wordle):
                     for c in w:
                         freq[c] += 1
                 guessable.sort(key=lambda w: sum([freq[c] for c in w]), reverse = True)
+           
             if guesses == 0: return float("inf"), None
             if len(possible_ans) == 1:
                 return 1, possible_ans[0]
@@ -39,6 +40,7 @@ class Bot(Wordle):
                     partitions[p].append(ans)
                 else:
                     partitions[p] = [ans]
+            partitions = dict(sorted(partitions.items(), key=lambda item: item[1]))
             t = 0
             for p in partitions:
                 t += minoverwords(filter(guessable, word, p), partitions[p], guesses, beta)[0]
