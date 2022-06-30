@@ -48,8 +48,11 @@ class Bot(Wordle):
                     return beta
             return t
 
-        def filter(possible_ans, word, partition):
-            return possible_ans
+        def filter(guessable, word, partition):
+            if not self.hardmode:
+                return guessable
+            return [g for g in guessable if self.validHardmodeGuess(g, [word], partitions=[partition])]
+
 
     
         return minoverwords(self.words[0:], self.words[0:], self.guesses)
