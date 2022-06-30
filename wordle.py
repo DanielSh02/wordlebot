@@ -22,7 +22,7 @@ class Wordle():
     def isCorrect(self, word: str) -> bool:
         return word == self.answer
 
-    def validHardmodeGuess(self, prev_words, guess, partitions=None):
+    def validHardmodeGuess(self, guess, prev_words, partitions=None):
         if not partitions:
             partitions = [self.result(w) for w in prev_words]
         for w in prev_words:
