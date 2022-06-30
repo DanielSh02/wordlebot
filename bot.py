@@ -35,7 +35,7 @@ class Bot(Wordle):
             # Lookup m(G, P, g) in the cache
             hash = cache_hash()
             if cache.get(hash):
-                print("cache used!")
+                # print("cache used!")
                 return cache[hash]
             heuristic_sort()
             best_word = None
@@ -44,6 +44,7 @@ class Bot(Wordle):
                 beta = sumoverpartitions(guessable, possible_ans, guesses - 1, word, beta)
                 if beta < temp:
                     best_word = word
+            beta += len(possible_ans)
             # Adds m(G, P, g) to the cache
             cache[hash] = beta, best_word
             return beta, best_word
@@ -62,7 +63,7 @@ class Bot(Wordle):
                 t += minoverwords(filter(guessable, word, p), partitions[p], guesses, beta)[0]
                 if t >= beta:
                     return beta
-            return t
+            return t - 1
 
         def filter(guessable, word, partition):
             if not self.hardmode:
