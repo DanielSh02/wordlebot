@@ -17,6 +17,6 @@ def main():
             print("Not a valid word")
 
             
-bot = Bot(guesses=100)
+bot = Bot(guesses=5)
 print(bot.result("table", "fable"))
 print(bot.solve())
