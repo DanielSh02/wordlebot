@@ -25,13 +25,13 @@ class Wordle():
     def validHardmodeGuess(self, guess, prev_words, partitions=None):
         if not partitions:
             partitions = [self.result(w) for w in prev_words]
-        for w in prev_words:
-            for i, c in enumerate(w):
-                if c == 2 and guess[i] != w[i]:
+        for depth, w in enumerate(prev_words):
+            for i, c in enumerate(partitions[depth]):
+                if c == '2' and guess[i] != w[i]:
                     return False
-                if c == 1 and (guess[i] == w[i] or w[i] not in guess):
+                if c == '1' and (guess[i] == w[i] or w[i] not in guess):
                     return False
-                if c == 0 and w[i] in guess:
+                if c == '0' and (w[i] in guess):
                     return False
         return True 
     
