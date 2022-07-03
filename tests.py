@@ -1,9 +1,10 @@
+import unittest
 from bot import *
 from wordle import *
 
 words = random.sample(default_word_list, 1000)
 bot = Bot(words=words, guesses=5)
-print(words)
+# print(words)
 
 wordlist = words[0:]
 
@@ -28,4 +29,21 @@ def test_avg_guesses():
         total_guessses += depth
     print(f'Predicted: {predicted_avg}, actual: {total_guessses / len(wordlist)}')
 
-test_avg_guesses()
+# test_avg_guesses()
+
+wordle = Wordle(hardmode = False)
+hard_wordle = Wordle()
+
+class WordleTests(unittest.TestCase):
+    
+    def test_result(self):
+        self.assertEqual(wordle.result("crane", "place"), "10202")
+        self.assertEqual(wordle.result("crane", "jazzy"), "00100")
+        self.assertEqual(wordle.result("tests", "jazzy"), "00000")
+        self.assertEqual(wordle.result("radar", "alarm"), "11010")
+        self.assertEqual(wordle.result("geese", "elite"), "01002")
+
+
+if __name__ == '__main__':
+    unittest.main()
+

@@ -1,7 +1,7 @@
 import enum
 import random
 
-from numpy import ndenumerate
+from numpy import indices, ndenumerate
 
 
 default_word_list = []
@@ -15,7 +15,6 @@ class Wordle():
     def __init__(self, words = default_word_list, guesses = 6, hardmode = True) -> None:
         self.words = words
         self.answer = random.choice(list(self.words))
-        print(self.answer)
         self.guesses = guesses
         self.hardmode = hardmode
         self.prev_guess = None
@@ -41,7 +40,7 @@ class Wordle():
         if not ans:
             ans = self.answer
         word = word.lower()
-        if self.hardmode and self.validHardmodeGuess(word, self.prev_word):
+        if self.hardmode and self.validHardmodeGuess(word, self.prev_guess):
             raise Exception("Invalid Guess")
         if not word in self.words:
             raise Exception("Invalid Guess")
@@ -49,10 +48,16 @@ class Wordle():
         for i, c in enumerate(word):
             if c == ans[i]:
                 res += "2"
-            elif c in ans:
-                res += "1"
-            else:
+            elif c not in ans:
                 res += "0"
+            else:
+                word_indices = [i for i, x in enumerate(word) if x == c]
+                correct_chars = len([i for i in word_indices if ans[i] == c])
+                total = ans.count(c)
+                if i > word_indices[total - 1 - correct_chars]:
+                    res += "0"
+                else:
+                    res += "1"
         self.prev_guess = word
         return res 
 
