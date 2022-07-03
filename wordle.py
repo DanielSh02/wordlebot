@@ -18,11 +18,14 @@ class Wordle():
         print(self.answer)
         self.guesses = guesses
         self.hardmode = hardmode
+        self.prev_guess = None
     
     def isCorrect(self, word: str) -> bool:
         return word == self.answer
 
     def validHardmodeGuess(self, guess, prev_word, partition=None):
+        if not prev_word:
+            return True
         if not partition:
             partition = self.result(prev_word)
         for i, c in enumerate(partition):
@@ -38,7 +41,8 @@ class Wordle():
         if not ans:
             ans = self.answer
         word = word.lower()
-        # TODO: Implement checking for valid guesses in hardmode.
+        if self.hardmode and self.validHardmodeGuess(word, self.prev_word):
+            raise Exception("Invalid Guess")
         if not word in self.words:
             raise Exception("Invalid Guess")
         res = ""
@@ -49,6 +53,7 @@ class Wordle():
                 res += "1"
             else:
                 res += "0"
+        self.prev_guess = word
         return res 
 
     
