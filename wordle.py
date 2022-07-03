@@ -22,17 +22,16 @@ class Wordle():
     def isCorrect(self, word: str) -> bool:
         return word == self.answer
 
-    def validHardmodeGuess(self, guess, prev_words, partitions=None):
-        if not partitions:
-            partitions = [self.result(w) for w in prev_words]
-        for depth, w in enumerate(prev_words):
-            for i, c in enumerate(partitions[depth]):
-                if c == '2' and guess[i] != w[i]:
-                    return False
-                if c == '1' and (guess[i] == w[i] or w[i] not in guess):
-                    return False
-                if c == '0' and (w[i] in guess):
-                    return False
+    def validHardmodeGuess(self, guess, prev_word, partition=None):
+        if not partition:
+            partition = self.result(prev_word)
+        for i, c in enumerate(partition):
+            if c == '2' and guess[i] != prev_word[i]:
+                return False
+            if c == '1' and (guess[i] == prev_word[i] or prev_word[i] not in guess):
+                return False
+            if c == '0' and (prev_word[i] in guess):
+                return False
         return True 
     
     def result(self, word: str, ans = None) -> list[int]:
