@@ -18,7 +18,6 @@ class Wordle():
         self.guesses = guesses
         self.hardmode = hardmode
         self.prev_guess = None
-        self.isPlaying = True
     
     def isCorrect(self, word: str) -> bool:
         return word == self.answer
@@ -28,15 +27,7 @@ class Wordle():
             return True
         if not partition:
             partition = self.result(prev_word)
-        for i, c in enumerate(partition):
-            if c == '2' and guess[i] != prev_word[i]:
-                return False
-            # TODO: Hardmode checking doesn't handle repeat letters correctly
-            if c == '1' and (guess[i] == prev_word[i] or prev_word[i] not in guess):
-                return False
-            if c == '0' and (prev_word[i] in guess):
-                return False
-        return True 
+        return self.result(guess, prev_word)
     
     def result(self, word: str, ans = None) -> list[int]:
         if not ans:
@@ -56,7 +47,6 @@ class Wordle():
                 word_indices = [i for i, x in enumerate(word) if x == c]
                 correct_chars = len([i for i in word_indices if ans[i] == c])
                 total = ans.count(c)
-                print(word, ans, c, word_indices, total, correct_chars)
                 if total >= len(word_indices) or i <= word_indices[total - 1 - correct_chars]:
                     res += "1"
                 else:
