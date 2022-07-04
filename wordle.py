@@ -1,4 +1,4 @@
-import enum
+from pydoc import ispackage
 import random
 
 from numpy import indices, ndenumerate
@@ -18,6 +18,7 @@ class Wordle():
         self.guesses = guesses
         self.hardmode = hardmode
         self.prev_guess = None
+        self.isPlaying = True
     
     def isCorrect(self, word: str) -> bool:
         return word == self.answer
@@ -30,6 +31,7 @@ class Wordle():
         for i, c in enumerate(partition):
             if c == '2' and guess[i] != prev_word[i]:
                 return False
+            # TODO: Hardmode checking doesn't handle repeat letters correctly
             if c == '1' and (guess[i] == prev_word[i] or prev_word[i] not in guess):
                 return False
             if c == '0' and (prev_word[i] in guess):
@@ -40,7 +42,7 @@ class Wordle():
         if not ans:
             ans = self.answer
         word = word.lower()
-        if self.hardmode and self.validHardmodeGuess(word, self.prev_guess):
+        if self.hardmode and not self.validHardmodeGuess(word, self.prev_guess):
             raise Exception("Invalid Guess")
         if not word in self.words:
             raise Exception("Invalid Guess")
@@ -54,10 +56,11 @@ class Wordle():
                 word_indices = [i for i, x in enumerate(word) if x == c]
                 correct_chars = len([i for i in word_indices if ans[i] == c])
                 total = ans.count(c)
-                if i > word_indices[total - 1 - correct_chars]:
-                    res += "0"
-                else:
+                print(word, ans, c, word_indices, total, correct_chars)
+                if total >= len(word_indices) or i <= word_indices[total - 1 - correct_chars]:
                     res += "1"
+                else:
+                    res += "0"
         self.prev_guess = word
         return res 
 
