@@ -27,7 +27,7 @@ class Wordle():
             return True
         if not partition:
             partition = self.result(prev_word)
-        return self.result(guess, prev_word) == partition
+        return self.result(prev_word, guess) == partition
     
     def result(self, word: str, ans = None) -> list[int]:
         if not ans:
