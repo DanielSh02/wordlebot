@@ -1,20 +1,39 @@
-from turtle import pos
+from email.policy import default
+from math import log2
 from wordle import *
 
-
 class Bot(Wordle):
-    def __init__(self, words=["salet", "slate", "spunk", "jazzy"], guesses=6) -> None:
+    def __init__(self, words=default_word_list, guesses=6) -> None:
         super().__init__(words, guesses)
         
-    
+    def result(self, word: str, ans=None) -> list[int]:
+        self.prev_guess = None
+        return super().result(word, ans)
+
+    def gen_partitions(self, word, possible_ans):
+            partitions = {}
+            for ans in possible_ans:
+                p = self.result(word, ans)
+                if partitions.get(p):
+                    partitions[p].append(ans)
+                else:
+                    partitions[p] = [ans]
+            return partitions
+
     def solve(self):
 
         cache = {}
 
-        def minoverwords(guessable, possible_ans, guesses, beta = float("inf")):
-            # for x in cache:
-                # print(f"{x}: {cache[x]}")
-            def heuristic_sort():
+        def entropy(word, possible_ans):
+            p = self.gen_partitions(word, possible_ans)
+            n = len(possible_ans)
+            res = 0
+            for x in p:
+                px = len(p[x]) / n
+                res -= px * log2(px)
+            return res
+        
+        def heuristic_sort(guessable, possible_ans):
                 letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
                            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
                 freq = {letter: 0 for letter in letters}
@@ -22,6 +41,10 @@ class Bot(Wordle):
                     for c in w:
                         freq[c] += 1
                 guessable.sort(key=lambda w: sum([freq[c] for c in w]), reverse = True)
+
+        def minoverwords(guessable, possible_ans, guesses, beta = float("inf")):
+            # for x in cache:
+                # print(f"{x}: {cache[x]}")
 
             # Defines a tuple to place m(G, P, g) in the cache.
             def cache_hash():
@@ -37,7 +60,8 @@ class Bot(Wordle):
             if cache.get(hash):
                 # print("cache used!")
                 return cache[hash]
-            heuristic_sort()
+            # guessable.sort(key = lambda w: entropy(w, possible_ans), reverse = True)
+            heuristic_sort(guessable, possible_ans)
             best_word = None
             for word in guessable:
                 temp = beta
@@ -50,13 +74,7 @@ class Bot(Wordle):
             return beta, best_word
 
         def sumoverpartitions(guessable, possible_ans, guesses, word, beta):
-            partitions = {}
-            for ans in possible_ans:
-                p = self.result(word, ans)
-                if partitions.get(p):
-                    partitions[p].append(ans)
-                else:
-                    partitions[p] = [ans]
+            partitions = self.gen_partitions(word, possible_ans)
             partitions = dict(sorted(partitions.items(), key=lambda item: item[1]))
             t = 0
             for p in partitions:
