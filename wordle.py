@@ -32,7 +32,6 @@ class Wordle():
     def result(self, word: str, ans = None) -> list[int]:
         if not ans:
             ans = self.answer
-        print(word)
         word = word.lower()
         if self.hardmode and not self.validHardmodeGuess(word, self.prev_guess):
             raise Exception("Invalid Guess")
