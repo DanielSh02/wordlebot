@@ -9,11 +9,17 @@ with open("wordlists/valid-wordle-words.txt", "r") as words:
     for word in words:
         default_word_list.append(word.strip())
 
+default_ans_list = []
+with open("wordlists/possible_ans.txt", "r") as words:
+    for word in words:
+        default_ans_list.append(word.strip())
+
 
 class Wordle():
 
-    def __init__(self, words = default_word_list, guesses = 6, hardmode = True) -> None:
+    def __init__(self, words = default_word_list, guesses = 6, possible_ans = default_ans_list, hardmode = True) -> None:
         self.words = words
+        self.possible_ans = possible_ans
         self.answer = random.choice(list(self.words))
         self.guesses = guesses
         self.hardmode = hardmode

@@ -1,4 +1,3 @@
-from email.policy import default
 from math import log2
 from wordle import *
 
@@ -92,4 +91,4 @@ class Bot(Wordle):
 
 
     
-        return minoverwords(self.words[0:], self.words[0:], self.guesses)
+        return minoverwords(self.words[0:], self.possible_ans[0:], self.guesses)
