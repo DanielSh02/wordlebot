@@ -20,10 +20,10 @@ class Bot(Wordle):
                     partitions[p] = [ans]
             return partitions
 
-    def filter(self, guessable, word, partition):
+    def filter(self, lst, word, partition):
             if not self.hardmode:
-                return guessable
-            return [g for g in guessable if self.validHardmodeGuess(g, word, partition)]
+                return lst
+            return [g for g in lst if self.validHardmodeGuess(g, word, partition)]
 
     def solve(self):
 
@@ -83,7 +83,7 @@ class Bot(Wordle):
             partitions = dict(sorted(partitions.items(), key=lambda item: item[1]))
             t = 0
             for p in partitions:
-                t += minoverwords(filter(guessable, word, p), partitions[p], guesses, beta)[0]
+                t += minoverwords(self.filter(guessable, word, p), partitions[p], guesses, beta)[0]
                 if t >= beta:
                     return beta
             return t - 1
