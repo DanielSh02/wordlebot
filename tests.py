@@ -25,7 +25,7 @@ def test_avg_guesses():
         guess = best_word
         while not bot.isCorrect(guess):
             partition = bot.result(guess)
-            bot.words = [g for g in bot.words if bot.validHardmodeGuess(g, guess, partition)]
+            bot.words = bot.filter(bot.words, guess, partition)
             guess = bot.solve()[1]
             depth += 1
         total_guessses += depth

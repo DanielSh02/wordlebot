@@ -20,6 +20,11 @@ class Bot(Wordle):
                     partitions[p] = [ans]
             return partitions
 
+    def filter(self, guessable, word, partition):
+            if not self.hardmode:
+                return guessable
+            return [g for g in guessable if self.validHardmodeGuess(g, word, partition)]
+
     def solve(self):
 
         cache = {}
@@ -60,8 +65,8 @@ class Bot(Wordle):
             if cache.get(hash):
                 # print("cache used!")
                 return cache[hash]
-            # guessable.sort(key = lambda w: entropy(w, possible_ans), reverse = True)
-            heuristic_sort(guessable, possible_ans)
+            guessable.sort(key = lambda w: entropy(w, possible_ans), reverse = True)
+            # heuristic_sort(guessable, possible_ans)
             best_word = None
             for word in guessable:
                 temp = beta
@@ -83,10 +88,7 @@ class Bot(Wordle):
                     return beta
             return t - 1
 
-        def filter(guessable, word, partition):
-            if not self.hardmode:
-                return guessable
-            return [g for g in guessable if self.validHardmodeGuess(g, word, partition)]
+        
 
 
     
