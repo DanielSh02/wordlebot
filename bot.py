@@ -24,7 +24,12 @@ class Bot(Wordle):
                 return lst
             return [g for g in lst if self.validHardmodeGuess(g, word, partition)]
 
-    def solve(self):
+    def solve(self, guessable=None, possible_ans=None):
+        if guessable is None:
+            guessable = self.words
+
+        if possible_ans is None:
+            possible_ans = self.possible_ans
 
         cache = {}
 
@@ -87,8 +92,5 @@ class Bot(Wordle):
                     return beta
             return t - 1
 
-        
-
-
     
-        return minoverwords(self.words[0:], self.possible_ans[0:], self.guesses)
+        return minoverwords(guessable, possible_ans, self.guesses)
