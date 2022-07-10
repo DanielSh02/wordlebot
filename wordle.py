@@ -1,7 +1,4 @@
-from pydoc import ispackage
 import random
-
-from numpy import indices, ndenumerate
 
 
 default_word_list = []
@@ -28,20 +25,18 @@ class Wordle():
     def isCorrect(self, word: str) -> bool:
         return word == self.answer
 
-    def validHardmodeGuess(self, guess, prev_word, partition=None):
+    def validHardmodeGuess(self, guess: str, prev_word: str = None, partition=None) -> bool:
         if not prev_word:
             return True
         if not partition:
             partition = self.result(prev_word)
         return self.result(prev_word, guess) == partition
     
-    def result(self, word: str, ans = None) -> list[int]:
+    def result(self, word: str, ans = None) -> str:
         if not ans:
             ans = self.answer
         word = word.lower()
         if self.hardmode and not self.validHardmodeGuess(word, self.prev_guess):
-            raise Exception("Invalid Guess")
-        if not word in self.words:
             raise Exception("Invalid Guess")
         res = ""
         for i, c in enumerate(word):
@@ -59,12 +54,3 @@ class Wordle():
                     res += "0"
         self.prev_guess = word
         return res 
-
-    
-    
-
-
-        
-
-
-

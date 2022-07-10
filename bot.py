@@ -5,11 +5,11 @@ class Bot(Wordle):
     def __init__(self, words=default_word_list, guesses=6) -> None:
         super().__init__(words, guesses)
         
-    def result(self, word: str, ans=None) -> list[int]:
+    def result(self, word: str, ans: str = None) -> list[int]:
         self.prev_guess = None
         return super().result(word, ans)
 
-    def gen_partitions(self, word, possible_ans):
+    def gen_partitions(self, word: str, possible_ans: list[str]) -> list[str]:
             partitions = {}
             for ans in possible_ans:
                 p = self.result(word, ans)
@@ -19,12 +19,12 @@ class Bot(Wordle):
                     partitions[p] = [ans]
             return partitions
 
-    def filter(self, lst, word, partition):
+    def filter(self, lst: list[str], word: str, partition: str) -> list[str]:
             if not self.hardmode:
                 return lst
             return [g for g in lst if self.validHardmodeGuess(g, word, partition)]
 
-    def solve(self, guessable=None, possible_ans=None):
+    def solve(self, guessable: list[str] = None, possible_ans: list[str] = None) -> tuple[float, str]:
         if guessable is None:
             guessable = self.words
 
@@ -33,7 +33,7 @@ class Bot(Wordle):
 
         cache = {}
 
-        def entropy(word, possible_ans):
+        def entropy(word: str, possible_ans: list[str]) -> float:
             p = self.gen_partitions(word, possible_ans)
             n = len(possible_ans)
             res = 0
@@ -42,7 +42,7 @@ class Bot(Wordle):
                 res -= px * log2(px)
             return res
         
-        def heuristic_sort(guessable, possible_ans):
+        def heuristic_sort(guessable: list[str], possible_ans: list[str]):
                 letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
                            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
                 freq = {letter: 0 for letter in letters}
@@ -51,7 +51,7 @@ class Bot(Wordle):
                         freq[c] += 1
                 guessable.sort(key=lambda w: sum([freq[c] for c in w]), reverse = True)
 
-        def minoverwords(guessable, possible_ans, guesses, beta = float("inf")):
+        def minoverwords(guessable: list[str], possible_ans: list[str], guesses: int, beta: float = float("inf")):
             # for x in cache:
                 # print(f"{x}: {cache[x]}")
 
@@ -82,7 +82,7 @@ class Bot(Wordle):
             cache[hash] = beta, best_word
             return beta, best_word
 
-        def sumoverpartitions(guessable, possible_ans, guesses, word, beta):
+        def sumoverpartitions(guessable: list[str], possible_ans: list[str], guesses: int, word: str, beta: float) -> float:
             partitions = self.gen_partitions(word, possible_ans)
             partitions = dict(sorted(partitions.items(), key=lambda item: item[1]))
             t = 0

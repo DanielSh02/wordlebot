@@ -1,4 +1,3 @@
-import re
 from wordle import *
 from bot import *
 
@@ -21,6 +20,8 @@ def main():
                 if len(bot.words) > 200:
                     print("This may take a while. Please be patient.")
                 guess = bot.solve()[1]
+            if partition != "22222":
+                print(f"Your next recommended guess is '{guess.upper()}'")
         else:
             print("That is not a valid string. Please try again.")
     print("Thank you for using Wordle Solver!")
@@ -43,5 +44,5 @@ def gen_first_guesses():
             guesses[partition] = guess
     return guesses
 
-
-main()
+if __name__ == '__main__':
+    main()
