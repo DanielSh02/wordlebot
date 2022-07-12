@@ -2,9 +2,9 @@ from math import log2
 from wordle import *
 
 class Bot(Wordle):
-    def __init__(self, words=default_word_list, guesses=6) -> None:
-        super().__init__(words, guesses)
-        
+    def __init__(self, words=default_word_list, possible_ans = default_ans_list, guesses=6) -> None:
+        super().__init__(words, guesses, possible_ans)
+
     def result(self, word: str, ans: str = None) -> list[int]:
         self.prev_guess = None
         return super().result(word, ans)
@@ -85,12 +85,15 @@ class Bot(Wordle):
         def sumoverpartitions(guessable: list[str], possible_ans: list[str], guesses: int, word: str, beta: float) -> float:
             partitions = self.gen_partitions(word, possible_ans)
             partitions = dict(sorted(partitions.items(), key=lambda item: item[1]))
-            t = 0
+            t = 0 
+            # If t in possible_ans, we should not count the partition "22222"
+            if word in possible_ans:
+                t -= 1
             for p in partitions:
                 t += minoverwords(self.filter(guessable, word, p), partitions[p], guesses, beta)[0]
                 if t >= beta:
                     return beta
-            return t - 1
+            return t
 
     
         return minoverwords(guessable, possible_ans, self.guesses)
