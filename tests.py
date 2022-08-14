@@ -1,4 +1,3 @@
-from email.policy import default
 import unittest
 from bot import *
 from wordle import *
@@ -34,6 +33,25 @@ def test_avg_guesses():
     end = time.time()
     print(end - start)
 
+def count_guesses(guessable = list[str], possible_ans = list[str]) -> int:
+    bot = Bot(words = guessable, possible_ans = possible_ans, guesses = 6)
+    res = 0
+    for i, ans in enumerate(possible_ans):
+        bot.words = guessable
+        bot.possible_ans = possible_ans
+        p = None
+        guesses = 0
+        while p != "22222":
+            guess = bot.solve(depth = 6 - guesses)[1]
+            guesses += 1
+            p = bot.result(guess, ans)
+            bot.words = bot.filter(bot.words, guess, p)
+            bot.possible_ans = bot.filter(bot.possible_ans, guess, p)
+        res += guesses
+    return res
+            
+
+
 def test_avg_guesses_with_lookup():
     bot = Bot()
     tot = 0 
@@ -53,9 +71,10 @@ def test_avg_guesses_with_lookup():
             if guess == "SALET":
                 guess = first_guesses[p]
             else:
-                guess = bot.solve()[1]
+                guess = bot.solve(depth = 6 - g)[1]
             p = bot.result(guess, w)
-        tot += g
+        tot += g + 1
+    print(f'Average guesses: {tot / len(default_ans_list)}')
     return tot / len(default_ans_list)
 
 wordle = Wordle(hardmode = False)
@@ -69,11 +88,14 @@ class WordleTests(unittest.TestCase):
         self.assertEqual(wordle.result("tests", "jazzy"), "00000", "all 0s")
         self.assertEqual(wordle.result("radar", "alarm"), "11010", "double letters")
         self.assertEqual(wordle.result("geese", "elite"), "01002", "triple letters")
-        with self.assertRaises(Exception, msg="invalid guess exception"):
-            wordle.result("xxxxx", "crane")
+        self.assertEqual(wordle.result('gamba', 'maxim'), "02100", "double letters false")
+        self.assertEqual(wordle.result("apart", "quart"), "00222", "apart quart")
+        self.assertEqual(wordle.result("quart", "apart"), "00222", "quart apart")
 
     def test_hardmode(self):
-        self.assertTrue(wordle.validHardmodeGuess("place", "crane", "10202"))
+        self.assertTrue(wordle.validHardmodeGuess("place", "crane", "10202"), msg = 'hardmode crane place')
+        self.assertFalse(wordle.validHardmodeGuess('maxim', 'gamba', '02101'), msg = 'hardmode gamba maxim')
+
 
     def test_gen_partitions(self):
         possible_ans = ["crane",
@@ -94,16 +116,74 @@ class WordleTests(unittest.TestCase):
                               "22222": ["arise"]},
                              msg = "gen_partitions med")
 
+    def test_solve_simple(self):
+        rhymes = ['fight', 'light', 'tight', 'right']
+        rhyme_bot = Bot(words = rhymes, possible_ans=rhymes, guesses = 5)
+        self.assertEqual(rhyme_bot.solve()[0], 10.0, msg = "rhyme bot")
+        rhyme_bot.guesses = 3
+        self.assertEqual(rhyme_bot.solve()[0], float("inf"), "not solvable")
+        one_word_bot = Bot(words = ["arise"], possible_ans = ["arise"])
+        self.assertEqual(one_word_bot.solve(), (1.0, "arise"), msg="one word bot")
+        clear_answer_bot = Bot(words = ["plant", "jazzy", "print", "mouse"], 
+                               possible_ans = ["plant", "jazzy", "print", "mouse"],
+                               guesses = 6)
+        self.assertEqual(clear_answer_bot.solve(), (7.0, "plant"), msg = "first guess partitions")
 
-# if __name__ == '__main__':
-#     unittest.main()
-# test_avg_guesses()  
+    def test_bot_night(self):
+        self.maxDiff = None
+        bot = Bot()
+        bot.answer = "night"
+        bot.words = bot.filter(bot.words, "salet", "00002")
+        bot.possible_ans = bot.filter(bot.possible_ans, "salet", "00002")
+        remaining = [
+            "CRYPT", "DIGIT", "DRIFT", "FIGHT", "RIGHT", "TIGHT", "TWIXT", "WIGHT",
+            "BIGOT", "DROIT", "IDIOT", "ORBIT", "PIVOT",
+            "GROUT", "OUGHT", "TROUT",
+            "INPUT", "UNCUT", "UNFIT",
+            "BRUNT", "GRUNT",
+            "COURT", "DOUBT",
+            "JOINT",
+            "POINT",
+            "BURNT",
+            "COUNT",
+            "DONUT",
+            "FRONT",
+            "FRUIT",
+            "INGOT",
+            "MIGHT",
+            "MOUNT",
+            "NIGHT",
+            "PRINT",
+            "ROBOT",
+            "VOMIT"]
+        remaining = list(map(lambda w: w.lower(), remaining))
+        self.assertCountEqual(remaining, bot.possible_ans)
+        total, next_guess = bot.solve()
+        word_list = bot.words[0:]
+        def count_guesses(init_guess):
+            tot = 0 
+            for ans in remaining:
+                guess = init_guess
+                p = bot.result(guess, ans)
+                guesses = 1
+                while p != "22222":
+                    bot.words = bot.filter(bot.words, guess, p)
+                    bot.possible_ans = bot.filter(bot.possible_ans, guess, p)
+                    guess = bot.solve()[1]
+                    p = bot.result(guess, ans)
+                    guesses += 1
+                tot += guesses
+                bot.words = word_list[0:]
+                bot.possible_ans = remaining[0:]
+            return tot
+        tot = count_guesses(next_guess)
+        d = {}
+        self.assertEqual(total, tot, "expected[solve] = actual expected")
+        self.assertEqual(total, 92, "expected value correct")
 
-bot = Bot()
 
-lst = bot.filter(bot.words, "salet", "02000")
-print(lst)
-lst = bot.filter(lst, "carny", "02000")
-print(lst)
-lst = bot.filter(lst, "gamba", "02101")
-print(lst)
+if __name__ == '__main__':
+    unittest.main()
+    # test_avg_guesses_with_lookup()
+
+
