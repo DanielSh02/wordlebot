@@ -9,6 +9,7 @@ def main():
     print("Welcome to the Wordle Solver!")
     print(f"The first recommended guess is '{guess}'.")
     partition = ""
+    guesses = 0
     while partition != "22222":
         partition = input(f"Type in the result from guessing {guess.upper()}: ")
         if validPartition(partition):
@@ -19,11 +20,15 @@ def main():
             else:
                 if len(bot.words) > 200:
                     print("This may take a while. Please be patient.")
-                guess = bot.solve()[1]
+                guess = bot.solve(depth = 6 - guesses)[1]
             if partition != "22222":
                 print(f"Your next recommended guess is '{guess.upper()}'")
+            guesses += 1
         else:
             print("That is not a valid string. Please try again.")
+        if guesses >= 6:
+            print("Err, that's embarassing. I must have made a mistake. Sorry!")
+            break
     print("Thank you for using Wordle Solver!")
 
 

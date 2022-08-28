@@ -1,5 +1,6 @@
 import random
 
+from numpy import indices
 
 default_word_list = []
 with open("wordlists/valid-wordle-words.txt", "r") as words:
@@ -25,14 +26,14 @@ class Wordle():
     def isCorrect(self, word: str) -> bool:
         return word == self.answer
 
-    def validHardmodeGuess(self, guess: str, prev_word: str = None, partition=None) -> bool:
+    def validHardmodeGuess(self, guess: str, prev_word: str = None, partition: str = None) -> bool:
         if not prev_word:
             return True
         if not partition:
             partition = self.result(prev_word)
         return self.result(prev_word, guess) == partition
     
-    def result(self, word: str, ans = None) -> str:
+    def result(self, word: str, ans: str = None) -> str:
         if not ans:
             ans = self.answer
         word = word.lower()
@@ -45,12 +46,17 @@ class Wordle():
             elif c not in ans:
                 res += "0"
             else:
-                word_indices = [i for i, x in enumerate(word) if x == c]
-                correct_chars = len([i for i in word_indices if ans[i] == c])
+                word_indices = [j for j, x in enumerate(word) if x == c]
+                correct_chars = len([j for j in word_indices if ans[j] == c])
                 total = ans.count(c)
-                if total >= len(word_indices) or i <= word_indices[total - 1 - correct_chars]:
-                    res += "1"
-                else:
-                    res += "0"
+                try:
+                    if correct_chars >= total:
+                        res += "0"
+                    elif total >= len(word_indices) + correct_chars or i <= word_indices[total - correct_chars - 1]:
+                        res += "1"
+                    else:
+                        res += "0"
+                except IndexError:
+                    print(word, ans,i, word_indices, total, correct_chars)
         self.prev_guess = word
         return res 
